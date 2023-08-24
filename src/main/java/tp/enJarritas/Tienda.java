@@ -6,7 +6,7 @@ public class Tienda {
   
  private String nombre;
  private Short maxProductosEnStock;
- private Double saldoEnCaja;
+ private double saldoEnCaja;
  private ArrayList<HashMap<String, Producto>> inventario;
 
 

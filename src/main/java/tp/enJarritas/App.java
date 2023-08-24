@@ -1,12 +1,16 @@
 package tp.enJarritas;
 
-/**
- * Hello world!
- */
 public final class App {
     private App() {
     }
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+    short cantidadStock = 30;
+    double plataInicial = 40.000;
+      Tienda enJarritas = new Tienda("enJarritas", cantidadStock, plataInicial);
+
+      System.out.println(enJarritas.getNombre());
+
+
+
     }
 }
