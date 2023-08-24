@@ -1,18 +1,19 @@
 package tp.enJarritas;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 public class OrdenDeCompra {
-    Map <String, Integer> listaDeProductos;
+    HashMap <String, Integer> listaDeProductos;
+    HashMap <String, Float> listaDeDescuentos;
 
 
     public OrdenDeCompra(
-       Map <String, Integer> listaDeProductos,
+       HashMap <String, Integer> listaDeProductos,
+       HashMap <String, Float> listaDeDescuentos,
        Tienda tienda
     )   {
         
-        //Definir metodo (foreach, map idfk) que verifique si los productos se encuentran dentro de la orden de compra
-        // y si estan disponibles a la venta.
         if(listaDeProductos.size() > 3){  
         throw new Error("El maximo de productos a comprar en una orden son tres.");  
         };
@@ -32,37 +33,51 @@ public class OrdenDeCompra {
         ArrayList<Boolean> esValido = new ArrayList<Boolean>();
     
         listaDeProductos.forEach((listaKey, listaCantidad) -> {
-            for(int cuenta = 0 ; cuenta <= 3; cuenta++){
-            Producto match =  tienda.getInventario().get(cuenta).get(listaKey);
-            if(match != null 
-            && match.isSeVende()){
+            for(int cuenta = 0 ; cuenta < 3; cuenta++){
+            Producto match =  tienda.getInventario().get(listaKey);
+            Float matchLista = listaDeDescuentos.get(listaKey);
+            if(
+            match != null 
+            && match.isSeVende() 
+            && matchLista != null){
                 esValido.add(cuenta, true);
                 return;
              }
          }
-        });
 
-        boolean answer = esValido.stream().allMatch(item -> item == true) && esValido.size() == 3;
+
+        }); // fin de constructor
+
+        boolean answer = esValido.stream().allMatch(item -> item == true) && esValido.size() == listaDeProductos.size();
         if(!answer){
-            throw new Error("Uno o mas productos no existen en el inventario");
+            throw new Error("Uno o mas productos no existen en el inventario o la lista de descuentos no coincide");
         };
 
         
 
-        this.listaDeProductos = listaDeProductos;   
+        this.listaDeProductos = listaDeProductos;
+        this.listaDeDescuentos = listaDeDescuentos;   
      }
-
 
 
     public Map<String, Integer> getListaDeProductos() {
         return listaDeProductos;
     }
+    public Map<String, Float> getListaDeDescuentos() {
+        return listaDeDescuentos;
+    }
 
-    
+
+
+
+
+
+
+
+
+
+}
    
     
 
 
-    
-
-}

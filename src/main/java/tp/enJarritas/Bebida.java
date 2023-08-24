@@ -1,6 +1,6 @@
 package tp.enJarritas;
 import java.util.regex.Pattern;
-public class Bebida extends Producto implements Descuento, Comestible{
+public class Bebida extends Producto implements Comestible{
 
     private Boolean esAlcoholica;
     private Float graduacionAlcoholica;
@@ -15,18 +15,18 @@ public class Bebida extends Producto implements Descuento, Comestible{
     String id, 
     String nombre, 
     String descripcion, 
-    Integer cantidadEnStock, 
-    Double precioUnidad,
-    Double costoUnidad,
-    Boolean esImportado,
+    int cantidadEnStock, 
+    Float precioUnidad,
+    Float costoUnidad,
+    boolean esImportado,
     String origen,
-    Boolean esAlcoholica,
-    Float graduacionAlcoholica,
+    boolean esAlcoholica,
+    float graduacionAlcoholica,
     short calorias,
     String fechaDeVencimiento
 ){
     super(id, nombre, descripcion, cantidadEnStock, precioUnidad, costoUnidad);
-    if(Pattern.matches(id, "AC[0-9]{3}")){
+    if(Pattern.matches("AC[0-9]{3}", id )){
     this.esImportado = esImportado;
     this.origen = origen;
 
@@ -36,7 +36,7 @@ public class Bebida extends Producto implements Descuento, Comestible{
 
     this.calorias = calorias;
     this.fechaDeVencimiento = fechaDeVencimiento;
-    } else { throw new Error("ID invalido"); }
+    } else { throw new Error("ID invalido. Las bebidas deben contener un ID de 5 digitos que respete el formato AC + un numero de tres digitos"); }
 
     }
 

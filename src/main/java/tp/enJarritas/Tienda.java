@@ -5,36 +5,20 @@ import java.util.HashMap;
 public class Tienda {
   
  private String nombre;
- private Short maxProductosEnStock;
- private double saldoEnCaja;
- private ArrayList<HashMap<String, Producto>> inventario;
+ private Integer maxProductosEnStock;
+ private float saldoEnCaja;
+ private HashMap<String, Producto> inventario;
 
 
  public Tienda(
     String nombre,
-    Short maxProductosEnStock,
-    Double saldoEnCaja
+    Integer maxProductosEnStock,
+    Float saldoEnCaja
  ){
     this.nombre = nombre;
     this.maxProductosEnStock = maxProductosEnStock;
     this.saldoEnCaja = saldoEnCaja;
-    this.inventario = new ArrayList<HashMap<String, Producto>>();
-    HashMap<String, Producto> bebidas = new HashMap<String, Producto>();
-    HashMap<String, Producto> deLimpiezas = new HashMap<String, Producto>();
-    HashMap<String, Producto> envasados = new HashMap<String, Producto>();
-    
-
-    inventario.add(bebidas);
-    inventario.add(deLimpiezas);
-    inventario.add(envasados);
-
-
-   
-   
-
-
-
-
+    this.inventario = new HashMap<String, Producto>();
  }
 
 
@@ -43,29 +27,48 @@ public class Tienda {
  //metodos
 
 
-private void verificarAdicion(int index, int cantidad, Producto producto){
-    if(this.inventario.get(index).containsValue(producto)){ System.out.println("El producto ya ha sido agregado al inventario");  
+private void verificarAdicion(int cantidad, Producto producto){
+    if(this.inventario.get(producto.getId()) != null){ System.out.println("El producto ya ha sido agregado al inventario");  
     }
-    if(this.saldoEnCaja - (cantidad * producto.getCostoUnidad()) < 0){
-    throw new Error("El producto no puede ser agregado por saldo insuficiente");
+    if(producto.getCantidadEnStock() != cantidad){
+        throw new Error("La cantidad inicializada en stock debe corresponder a la cantidad que desea ser agregada");
     }
-   this.inventario.get(index).put(producto.getId(), producto);
+    if(this.saldoEnCaja - (cantidad * producto.getCostoUnidad()) < 0){ 
+         throw new Error("El producto no puede ser agregado por saldo insuficiente");
+        }
+    if(this.getActualProductosEnStock() + cantidad > this.maxProductosEnStock){
+        throw new Error(
+            "El producto no puede agregarse porque superaria el stock maximo de la tienda por: " 
+            + ((this.getActualProductosEnStock() + cantidad) - this.maxProductosEnStock) + " unidades."
+            );
+    }
+
+   this.inventario.put(producto.getId(), producto);
    setSaldoEnCaja(getSaldoEnCaja() - (cantidad * producto.getCostoUnidad())); 
-
-
 
 }
 
-private void verificarCompra(int index, int cantidad, Producto producto){
- if(!this.inventario.get(index).containsValue(producto)){ System.out.println("El producto no existe en el inventario"); } 
+
+
+
+private void verificarCompra(int cantidad, Producto producto){
+ if(this.inventario.get(producto.getId()) == null){ System.out.println("El producto no existe en el inventario"); } 
 
  if(this.saldoEnCaja - (cantidad * producto.getCostoUnidad()) < 0){
     throw new Error("El producto no puede ser agregado por saldo insuficiente");
     }
 
-    Producto agregarProducto = this.inventario.get(index).get(producto.getId());
+if(this.getActualProductosEnStock() + cantidad > this.maxProductosEnStock){
+        throw new Error(
+            "El producto no puede agregarse porque superaria el stock maximo de la tienda por: " 
+            + ((this.getActualProductosEnStock() + cantidad) - this.maxProductosEnStock) + " unidades."
+            );
+    }
+
+    Producto agregarProducto = this.inventario.get(producto.getId());
     agregarProducto.setCantidadEnStock(agregarProducto.getCantidadEnStock() + cantidad);
     this.setSaldoEnCaja(this.getSaldoEnCaja() - (agregarProducto.getCostoUnidad() *  cantidad) );
+    System.out.println("Se han comprado " + cantidad + " del producto " + producto.getNombre());
 }
 
 
@@ -73,77 +76,71 @@ private void verificarCompra(int index, int cantidad, Producto producto){
 
  public void agregarProducto(Producto producto, int cantidad){
     if(cantidad < 1){ throw new Error("Se requiere minimo una unidad comprada"); }
-
-    if(producto instanceof Bebida){
-      verificarAdicion(0, cantidad, producto);
-    } else if(producto instanceof deLimpieza){
-        verificarAdicion(1, cantidad, producto);
-    } else if (producto instanceof Envasado) {
-        verificarAdicion(2, cantidad, producto);
-
-    } else throw new Error("Tipo de producto invalido");
-
-    
- } 
+    verificarAdicion(cantidad, producto);
+    } 
 
 
 public void comprarProducto(Producto producto, int cantidad){
 if(cantidad < 1){ throw new Error("Se requiere minimo una unidad comprada"); }
-
-    if(producto instanceof Bebida){
-      verificarCompra(0, cantidad, producto);
-    } else if(producto instanceof deLimpieza){
-        verificarCompra(1, cantidad, producto);
-    } else if (producto instanceof Envasado) {
-        verificarCompra(2, cantidad, producto);
-
-    } else throw new Error("Tipo de producto invalido");
-
-
-
+verificarCompra(cantidad, producto);
 }
 
 
 public Producto identificarProducto(String id){
 if(id.startsWith("AC")){
- return (Bebida)inventario.get(0).get(id);
+ return (Bebida)inventario.get(id);
 
 } else if(id.startsWith("AZ")){
-return (deLimpieza)inventario.get(1).get(id);
+return (deLimpieza)inventario.get(id);
+
 } else if (id.startsWith("AB")){
-return (Envasado)inventario.get(2).get(id);
+return (Envasado)inventario.get(id);
+
 } else throw new Error("tipo de id invalido");
 
 }
 
 
-// como mierda se si hay descuentos o no?
+
  public void venderProductos(OrdenDeCompra orden){
     ArrayList <String> recibo = new ArrayList<String>();
-    ArrayList <Double> precios = new ArrayList<Double>();
+    ArrayList <Float> precios = new ArrayList<Float>();
 
 
     orden.listaDeProductos.forEach((id, cantidad) -> {
     Producto producto = identificarProducto(id);
-    double precio = producto.getPrecioUnidad() * cantidad;
+
+    float precio =  producto.getPrecioConDescuento(orden.listaDeDescuentos.get(id)) * cantidad;
+
+    if(producto instanceof Bebida){
+        precio = ((Bebida)producto).getEsImportado() 
+        ? producto.getPrecioUnidad() + ((producto.getPrecioUnidad() * 10) / 100)
+        : precio;
+    } else if (producto instanceof Bebida)
+        precio = ((Bebida)producto).getEsImportado() 
+        ? producto.getPrecioUnidad() + ((producto.getPrecioUnidad() * 10) / 100)
+        : precio;
     
     if(producto.getCantidadEnStock() - cantidad < 0){
-        precio = producto.getCantidadEnStock() * producto.getPrecioUnidad();
+        precio = producto.getCantidadEnStock() * producto.getPrecioConDescuento(orden.listaDeDescuentos.get(id));
         precios.add(precio);
         this.setSaldoEnCaja(this.getSaldoEnCaja() + precio);
         producto.setSeVende(false);
         producto.setCantidadEnStock(0);
          recibo.add(id + ", " + producto.getNombre() + " " + cantidad + " X " + precio);
         } 
+
         else {
         recibo.add(id + ", " + producto.getNombre() + " " + cantidad + " X " + precio);
         precios.add(precio);
         this.setSaldoEnCaja(this.getSaldoEnCaja() + precio);
         }
         }); //fin de loop
+
+
         recibo.forEach(str ->  System.out.println(str) );
-        // to do + precios.stream().reduce(0,(a, b) -> a + b)
-        System.out.println("TOTAL VENTA: ");
+        float precioFinal = precios.stream().reduce(0f, (subtotal, valor) -> subtotal + valor);
+        System.out.println("TOTAL VENTA: " + precioFinal);
     
     
     }
@@ -159,30 +156,36 @@ return (Envasado)inventario.get(2).get(id);
         this.nombre = nombre;
     }
 
-    public Short getMaxProductosEnStock() {
+    public Integer getMaxProductosEnStock() {
         return this.maxProductosEnStock;
     }
 
-    public void setMaxProductosEnStock(Short maxProductosEnStock) {
+    public void setMaxProductosEnStock(Integer maxProductosEnStock) {
         this.maxProductosEnStock = maxProductosEnStock;
     }
 
-    public Double getSaldoEnCaja() {
+    public Integer getActualProductosEnStock(){
+      ArrayList<Integer>  cantidadesEnStock = new ArrayList<Integer>();
+        
+        this.inventario.forEach((key, producto) -> {
+            cantidadesEnStock.add(producto.getCantidadEnStock());
+         });
+     
+       Integer cantidadTotal = cantidadesEnStock.stream().reduce(0, (subtotal, valor) -> subtotal + valor);     
+        return cantidadTotal;
+}
+
+    public Float getSaldoEnCaja() {
         return this.saldoEnCaja;
     }
 
-    public void setSaldoEnCaja(Double saldoEnCaja) {
+    public void setSaldoEnCaja(Float saldoEnCaja) {
         this.saldoEnCaja = saldoEnCaja;
     }
 
-    public ArrayList <HashMap<String, Producto>> getInventario() {
+    public HashMap<String, Producto> getInventario() {
         return this.inventario;
     }
-
-
-
-
-
 
 
 }

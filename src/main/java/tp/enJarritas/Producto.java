@@ -1,21 +1,22 @@
 package tp.enJarritas;
 
-public  abstract class Producto {
+public  abstract class Producto implements Descuento {
      private String id;
      private String nombre;
      private String descripcion;
      private Integer cantidadEnStock;
-     private Double precioUnidad;
-     private Double costoUnidad;
+     private Float precioUnidad;
+     private Float costoUnidad;
      private Boolean seVende = true;
 
     public Producto(String id, 
     String nombre, 
     String descripcion, 
     Integer cantidadEnStock, 
-    Double precioUnidad,
-    Double costoUnidad)
+    Float precioUnidad,
+    Float costoUnidad)
     {
+        this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.cantidadEnStock = cantidadEnStock;
@@ -52,19 +53,19 @@ public  abstract class Producto {
         this.cantidadEnStock = cantidadEnStock;
     }
 
-    public Double getPrecioUnidad() {
+    public Float getPrecioUnidad() {
         return this.precioUnidad;
     }
 
-    public void setPrecioUnidad(Double precioUnidad) {
+    public void setPrecioUnidad(Float precioUnidad) {
         this.precioUnidad = precioUnidad;
     }
 
-    public Double getCostoUnidad() {
+    public Float getCostoUnidad() {
         return this.costoUnidad;
     }
 
-    public void setCostoUnidad(Double costoUnidad) {
+    public void setCostoUnidad(Float costoUnidad) {
         this.costoUnidad = costoUnidad;
     }
 

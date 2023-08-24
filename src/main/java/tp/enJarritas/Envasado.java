@@ -21,8 +21,8 @@ public class Envasado extends Producto implements Comestible {
     String nombre, 
     String descripcion, 
     Integer cantidadEnStock, 
-    Double precioUnidad,
-    Double costoUnidad,
+    Float precioUnidad,
+    Float costoUnidad,
     Boolean esImportado,
     String origen,
     Short calorias,
@@ -36,7 +36,7 @@ public class Envasado extends Producto implements Comestible {
     }
 
 
-    if(Pattern.matches(id, "AB[0-9]{3}")){
+    if(Pattern.matches("AB[0-9]{3}", id )){
     this.esImportado = esImportado;
     this.origen = origen;
     this.calorias = calorias;
@@ -44,15 +44,15 @@ public class Envasado extends Producto implements Comestible {
     try {
       this.envase = tipoDeEnvase.valueOf(envase.toUpperCase());
        } catch(IllegalArgumentException err) {
-      System.out.println("Tipo de envase no valido");
+      throw new Error("tipo de envase no valido");
          }
-      } else {  throw new Error("ID invalido"); } 
+      } else {  throw new Error("ID invalido. Los envasados deben contener un ID de 5 digitos que respete el formato AB + un numero de tres digitos"); } 
     }
 
 
      //implementacion descuentos
 
-     public Float getPrecioConDescuento(Float porcentaje){
+     public float getPrecioConDescuento(float porcentaje){
       if(porcentaje > 20.00){
            throw new Error("Los envasados no pueden tener mas de 20% de descuento");
       } 
@@ -64,7 +64,7 @@ public class Envasado extends Producto implements Comestible {
 
 
 
-    //implementar metodos abstractos
+    
      public short getCalorias(){
         return calorias;
      };
