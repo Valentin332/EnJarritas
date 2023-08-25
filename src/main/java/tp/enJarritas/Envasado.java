@@ -13,9 +13,10 @@ public class Envasado extends Producto implements Comestible {
     private Short calorias;
     private String vencimiento;
     private tipoDeEnvase envase;
+    private Float descuento;
 
 
-    // constructor, agregar verificacion de id y negar la construccion en caso de que no se cumpla
+  
      public Envasado(
     String id, 
     String nombre, 
@@ -27,41 +28,60 @@ public class Envasado extends Producto implements Comestible {
     String origen,
     Short calorias,
     String vencimiento,
-    String envase
+    String envase,
+    float descuento
    )  {
     super(id, nombre, descripcion, cantidadEnStock, precioUnidad, costoUnidad);
 
-    if(   precioUnidad > (costoUnidad + ((costoUnidad * 20) / 100 ))   ){
+    if( precioUnidad > (costoUnidad + ((costoUnidad * 20) / 100 )) ){
       throw new Error("El porcentaje de ganancia no puede superar el 20%");
     }
 
+    /* Decidí pasar el tipo de uso como un string para mayor facilidad al usar el constructor
+      * toUpperCase() se asegura de que no haya problemas por el uso de minusculas/mayusculas
+      * al settearlo en el constructor y en el metodo set se busca y utiliza el valor del Enum que
+      * corresponde al string ingresado.
+      */
 
     if(Pattern.matches("AB[0-9]{3}", id )){
+     try {
+    this.envase = tipoDeEnvase.valueOf(envase.toUpperCase());
+    } catch(IllegalArgumentException err) {
+      throw new Error("tipo de envase no valido");
+      }
+    if(descuento > 20.00){
+      throw new Error("Los envasados no pueden tener mas de 20% de descuento");
+      } 
+    this.descuento = descuento;
     this.esImportado = esImportado;
     this.origen = origen;
     this.calorias = calorias;
     this.vencimiento = vencimiento;
-    try {
-      this.envase = tipoDeEnvase.valueOf(envase.toUpperCase());
-       } catch(IllegalArgumentException err) {
-      throw new Error("tipo de envase no valido");
-         }
-      } else {  throw new Error("ID invalido. Los envasados deben contener un ID de 5 digitos que respete el formato AB + un numero de tres digitos"); } 
-    }
+    } else {  
+        throw new Error("ID invalido. Los envasados deben contener un ID de 5 digitos que respete el formato AB + un numero de tres digitos"); 
+      } 
+    
+    } //fin de constructor
 
 
      //implementacion descuentos
 
-     public float getPrecioConDescuento(float porcentaje){
-      if(porcentaje > 20.00){
-           throw new Error("Los envasados no pueden tener mas de 20% de descuento");
-      } 
-      final Float precioConDescuento = (float)(this.getPrecioUnidad() - ((this.getPrecioUnidad() * porcentaje) / 100));
+     public float getPrecioConDescuento(){
+      final Float precioConDescuento = (float)(this.getPrecioUnidad() - ((this.getPrecioUnidad() * this.getDescuento()) / 100));
       if(precioConDescuento < this.getCostoUnidad()){  throw new Error("El descuento registrado para el producto " + this.getId() + " no pudo ser registrado");   }
       return precioConDescuento ;
    }
 
+   public void setDescuento(float descuento){
+    if(descuento > 20.00){
+      throw new Error("Los envasados no pueden tener mas de 20% de descuento");
+      } 
+    this.descuento = descuento;
+   }
 
+   public float getDescuento(){
+    return  this.descuento;
+   }
 
 
     

@@ -5,11 +5,15 @@ public class Bebida extends Producto implements Comestible{
     private Boolean esAlcoholica;
     private Float graduacionAlcoholica;
 
+
+    
     private Boolean esImportado;
     private String origen;
 
     private String fechaDeVencimiento;
     private Short calorias;
+
+    private Float descuento;
 
     public Bebida(
     String id, 
@@ -23,7 +27,8 @@ public class Bebida extends Producto implements Comestible{
     boolean esAlcoholica,
     float graduacionAlcoholica,
     short calorias,
-    String fechaDeVencimiento
+    String fechaDeVencimiento,
+    float descuento
 ){
     super(id, nombre, descripcion, cantidadEnStock, precioUnidad, costoUnidad);
     if(Pattern.matches("AC[0-9]{3}", id )){
@@ -36,21 +41,32 @@ public class Bebida extends Producto implements Comestible{
 
     this.calorias = calorias;
     this.fechaDeVencimiento = fechaDeVencimiento;
+    if(descuento > 15.00){
+         throw new Error("Las bebidas no pueden tener mas de 15% de descuento");
+    }
+    this.descuento = descuento;
     } else { throw new Error("ID invalido. Las bebidas deben contener un ID de 5 digitos que respete el formato AC + un numero de tres digitos"); }
 
     }
 
     //implementacion descuentos
 
-     public float getPrecioConDescuento(float porcentaje){
-        if(porcentaje > 15.00){
-             throw new Error("Las bebidas no pueden tener mas de 15% de descuento");
-        } 
-        final Float precioConDescuento = (float)(this.getPrecioUnidad() - ((this.getPrecioUnidad() * porcentaje) / 100));
-        if(precioConDescuento < this.getCostoUnidad()){  throw new Error("El descuento registrado para el producto " + this.getId() + " no pudo ser registrado");   }
+     public float getPrecioConDescuento(){ 
+        final Float precioConDescuento = (float)(this.getPrecioUnidad() - ((this.getPrecioUnidad() * this.getDescuento()) / 100));
+        if(precioConDescuento < this.getCostoUnidad()){  throw new Error("El descuento registrado para el producto " + this.getId() + " " + this.getNombre() + " no pudo ser registrado");   }
         return precioConDescuento ;
      }
 
+     public void setDescuento(float descuento){
+        if(descuento > 15.00){
+         throw new Error("Las bebidas no pueden tener mas de 15% de descuento");
+        }
+    this.descuento = descuento;
+     }
+
+     public float getDescuento(){
+        return this.descuento;
+     }
 
 
     //getters and setters
