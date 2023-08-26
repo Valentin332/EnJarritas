@@ -154,6 +154,10 @@ public final class App {
        // enJarritas.listarProductosConUtilidadesInferiores();
         // enJarritas.obtenerComestiblesConMenorDescuento();
 
+
+
+
+
       // TEST DE COMPRA, ADICION Y VENTA
       System.out.println("Hola, bienvenido a " + enJarritas.getNombre() + " ¿Que quieres hacer? "); 
       System.out.println("Ingrese 1 para reponer stock de un producto");
@@ -318,7 +322,7 @@ public final class App {
         testInputScan.close();
        }
       
-      
+       //FIN TEST COMPRA ADICION Y VENTA
       
       
   
